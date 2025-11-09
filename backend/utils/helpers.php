@@ -1,30 +1,5 @@
 <?php
-// Utility functions for the backend
-
-function sendResponse($data, $statusCode = 200) {
-    http_response_code($statusCode);
-    header('Content-Type: application/json');
-    // Don't escape forward slashes in JSON output
-    echo json_encode($data, JSON_UNESCAPED_SLASHES);
-    exit;
-}
-
-function sendError($message, $statusCode = 400) {
-    http_response_code($statusCode);
-    header('Content-Type: application/json');
-    // Don't escape forward slashes in JSON output
-    echo json_encode(['error' => $message], JSON_UNESCAPED_SLASHES);
-    exit;
-}
-
-function validateRequiredFields($data, $requiredFields) {
-    foreach ($requiredFields as $field) {
-        if (!isset($data[$field]) || empty($data[$field])) {
-            return false;
-        }
-    }
-    return true;
-}
+// Helper functions for the API
 
 function sanitizeInput($input) {
     if (is_array($input)) {
@@ -69,7 +44,7 @@ function formatExpenseResponse($expense) {
     return [
         'id' => $expense['id'],
         'bookingId' => $expense['booking_id'],
-        'vendorId' => $expense['vendor_id'], // Vendor ID, will be replaced with vendor name in API
+        'vendorId' => $expense['vendor_id'],
         'title' => $expense['title'],
         'category' => $expense['category'],
         'amount' => (float)$expense['amount'],
@@ -93,5 +68,19 @@ function formatVendorResponse($vendor) {
         'totalPaid' => (float)$vendor['total_paid'],
         'createdAt' => $vendor['created_at']
     ];
+}
+
+// Function to send JSON response
+function sendResponse($data, $statusCode = 200) {
+    http_response_code($statusCode);
+    echo json_encode($data, JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+// Function to send JSON error response
+function sendError($message, $statusCode = 500) {
+    http_response_code($statusCode);
+    echo json_encode(['error' => $message], JSON_UNESCAPED_SLASHES);
+    exit;
 }
 ?>

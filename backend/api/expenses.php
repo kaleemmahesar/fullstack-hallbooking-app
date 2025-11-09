@@ -155,6 +155,21 @@ class ExpenseAPI {
             // If this is a credit expense for a vendor, create a vendor transaction
             if ($expense->payment_status === 'credit' && $expense->vendor_id) {
                 $vendor = new Vendor($this->conn);
+                // Get the most recent transaction for this vendor to calculate the new balance
+                $latestQuery = "SELECT balance_after FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC, id DESC LIMIT 1";
+                $latestStmt = $this->conn->prepare($latestQuery);
+                $latestStmt->bindParam(1, $expense->vendor_id);
+                $latestStmt->execute();
+                
+                $latestBalance = 0;
+                if ($latestStmt->rowCount() > 0) {
+                    $latestRow = $latestStmt->fetch(PDO::FETCH_ASSOC);
+                    $latestBalance = abs((float)$latestRow['balance_after']); // Use absolute value
+                }
+                
+                // Calculate new balance (adding credit increases balance)
+                $newBalance = $latestBalance + $expense->amount;
+                
                 $transactionData = [
                     'vendor_id' => $expense->vendor_id,
                     'expense_id' => $expense->id,
@@ -162,7 +177,7 @@ class ExpenseAPI {
                     'amount' => $expense->amount,
                     'description' => 'Expense: ' . $expense->title,
                     'transaction_date' => date('Y-m-d'),
-                    'balance_after' => 0 // Will be calculated
+                    'balance_after' => $newBalance
                 ];
                 $vendor->addTransaction($transactionData);
                 $vendor->updateTotals($expense->vendor_id);

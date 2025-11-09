@@ -80,6 +80,21 @@ if ($request_uri === '' || $request_uri === '/') {
     $request_uri = '/api/bookings'; // Default to bookings for testing
 }
 
+// Check for payment routes first
+if (preg_match('/\/api\/bookings\/([0-9]+)\/payments$/', $request_uri, $matches)) {
+    require_once 'api/payments.php';
+    $payment_api = new PaymentAPI($db);
+    $booking_id = $matches[1];
+    if ($method == 'POST') {
+        $payment_api->addPayment($booking_id);
+    } elseif ($method == 'GET') {
+        $payment_api->getPayments($booking_id);
+    } else {
+        sendError('Method not allowed', 405);
+    }
+    exit;
+}
+
 // Route requests
 switch ($request_uri) {
     // Authentication routes
@@ -116,7 +131,7 @@ switch ($request_uri) {
         }
         break;
 
-    case (preg_match('/\/api\/bookings\/([0-9]+)/', $request_uri, $matches) ? true : false):
+    case (preg_match('/\/api\/bookings\/([0-9]+)$/', $request_uri, $matches) ? true : false):
         require_once 'api/bookings.php';
         $booking_api = new BookingAPI($db);
         $id = $matches[1];
@@ -146,7 +161,7 @@ switch ($request_uri) {
         }
         break;
 
-    case (preg_match('/\/api\/expenses\/([0-9]+)/', $request_uri, $matches) ? true : false):
+    case (preg_match('/\/api\/expenses\/([0-9]+)$/', $request_uri, $matches) ? true : false):
         require_once 'api/expenses.php';
         $expense_api = new ExpenseAPI($db);
         $id = $matches[1];
@@ -157,7 +172,7 @@ switch ($request_uri) {
         }
         break;
 
-    case (preg_match('/\/api\/expenses\/booking\/([0-9]+)/', $request_uri, $matches) ? true : false):
+    case (preg_match('/\/api\/expenses\/booking\/([0-9]+)$/', $request_uri, $matches) ? true : false):
         require_once 'api/expenses.php';
         $expense_api = new ExpenseAPI($db);
         $booking_id = $matches[1];
@@ -181,7 +196,7 @@ switch ($request_uri) {
         }
         break;
 
-    case (preg_match('/\/api\/vendors\/([0-9]+)/', $request_uri, $matches) ? true : false):
+    case (preg_match('/\/api\/vendors\/([0-9]+)$/', $request_uri, $matches) ? true : false):
         require_once 'api/vendors.php';
         $vendor_api = new VendorAPI($db);
         $id = $matches[1];
@@ -205,7 +220,7 @@ switch ($request_uri) {
         }
         break;
         
-    case (preg_match('/\/api\/vendor-transactions\/([0-9]+)/', $request_uri, $matches) ? true : false):
+    case (preg_match('/\/api\/vendor-transactions\/([0-9]+)$/', $request_uri, $matches) ? true : false):
         require_once 'api/vendor-transactions.php';
         $transaction_api = new VendorTransactionAPI($db);
         $vendor_id = $matches[1];

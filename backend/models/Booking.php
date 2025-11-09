@@ -217,7 +217,6 @@ class Booking {
     public function delete() {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt->bindParam(1, $this->id);
         return $stmt->execute();
     }
@@ -228,14 +227,14 @@ class Booking {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $booking_id);
         $stmt->execute();
-        $menuItems = [];
+        $menu_items = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $menuItems[] = $row['menu_item'];
+            $menu_items[] = $row['menu_item'];
         }
-        return $menuItems;
+        return $menu_items;
     }
 
-    public function addMenuItems($booking_id, $menuItems) {
+    public function addMenuItems($booking_id, $menu_items) {
         // First delete existing menu items for this booking
         $deleteQuery = "DELETE FROM booking_menu_items WHERE booking_id = ?";
         $deleteStmt = $this->conn->prepare($deleteQuery);
@@ -243,7 +242,7 @@ class Booking {
         $deleteStmt->execute();
 
         // Then add new menu items
-        foreach ($menuItems as $item) {
+        foreach ($menu_items as $item) {
             $query = "INSERT INTO booking_menu_items SET booking_id=:booking_id, menu_item=:menu_item";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(":booking_id", $booking_id);
@@ -254,7 +253,7 @@ class Booking {
 
     // Payments functions
     public function getPayments($booking_id) {
-        $query = "SELECT * FROM booking_payments WHERE booking_id = ?";
+        $query = "SELECT * FROM booking_payments WHERE booking_id = ? ORDER BY payment_date DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $booking_id);
         $stmt->execute();
@@ -310,6 +309,33 @@ class Booking {
             
             $stmt->execute();
         }
+    }
+    
+    // Method to add a single payment and update the booking's balance
+    public function addPayment($booking_id, $amount, $payment_date, $payment_method) {
+        // First, insert the payment
+        $query = "INSERT INTO booking_payments SET 
+            booking_id=:booking_id, 
+            amount=:amount, 
+            payment_date=:payment_date, 
+            payment_method=:payment_method";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":booking_id", $booking_id);
+        $stmt->bindParam(":amount", $amount);
+        $stmt->bindParam(":payment_date", $payment_date);
+        $stmt->bindParam(":payment_method", $payment_method);
+        
+        if ($stmt->execute()) {
+            // Then, update the booking's balance by subtracting the payment amount
+            $updateQuery = "UPDATE " . $this->table_name . " SET balance = balance - :amount WHERE id = :booking_id";
+            $updateStmt = $this->conn->prepare($updateQuery);
+            $updateStmt->bindParam(":amount", $amount);
+            $updateStmt->bindParam(":booking_id", $booking_id);
+            
+            return $updateStmt->execute();
+        }
+        
+        return false;
     }
 }
 ?>

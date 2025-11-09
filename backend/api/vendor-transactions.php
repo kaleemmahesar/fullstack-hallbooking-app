@@ -62,12 +62,12 @@ class VendorTransactionAPI {
         // Prepare transaction data
         $transactionData = [
             'vendor_id' => $data->vendorId,
-            'expense_id' => $data->expenseId ?? null,
+            'expense_id' => isset($data->expenseId) ? $data->expenseId : null,
             'type' => $data->type,
             'amount' => $data->amount,
             'description' => $data->description ?? '',
             'transaction_date' => $data->date ?? date('Y-m-d'),
-            'balance_after' => 0 // Will be calculated
+            'balance_after' => isset($data->balanceAfter) ? $data->balanceAfter : 0
         ];
 
         // Create transaction

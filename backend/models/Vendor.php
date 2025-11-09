@@ -114,7 +114,7 @@ class Vendor {
 
     // Transaction functions
     public function getTransactions($vendor_id) {
-        $query = "SELECT * FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC";
+        $query = "SELECT * FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC, id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $vendor_id);
         $stmt->execute();
@@ -122,6 +122,33 @@ class Vendor {
     }
 
     public function addTransaction($transactionData) {
+        // If balance_after is not provided or is 0, calculate it
+        if (!isset($transactionData['balance_after']) || $transactionData['balance_after'] == 0) {
+            // Get the most recent transaction for this vendor to calculate the new balance
+            $latestQuery = "SELECT balance_after, type, amount FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC, id DESC LIMIT 1";
+            $latestStmt = $this->conn->prepare($latestQuery);
+            $latestStmt->bindParam(1, $transactionData['vendor_id']);
+            $latestStmt->execute();
+            
+            $latestBalance = 0;
+            if ($latestStmt->rowCount() > 0) {
+                $latestRow = $latestStmt->fetch(PDO::FETCH_ASSOC);
+                $latestBalance = abs((float)$latestRow['balance_after']); // Use absolute value
+            }
+            
+            // Calculate new balance based on transaction type
+            if ($transactionData['type'] === 'credit') {
+                $transactionData['balance_after'] = $latestBalance + $transactionData['amount'];
+            } else {
+                $transactionData['balance_after'] = $latestBalance - $transactionData['amount'];
+            }
+        }
+        
+        // Ensure the balance is never negative (this is a business rule)
+        if ($transactionData['balance_after'] < 0) {
+            $transactionData['balance_after'] = abs($transactionData['balance_after']);
+        }
+        
         $query = "INSERT INTO vendor_transactions SET 
             vendor_id=:vendor_id,
             expense_id=:expense_id,
