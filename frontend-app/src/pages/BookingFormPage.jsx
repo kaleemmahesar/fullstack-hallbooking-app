@@ -54,32 +54,32 @@ const BookingFormPage = () => {
   // Check if we're editing an existing booking
   const isEditing = !!id;
   const existingBooking = useSelector(state => 
-    state.bookings.bookings.find(booking => booking.id === id)
+    state.bookings.bookings.find(booking => booking.id.toString() === id)
   );
 
   // Initial form values
   const initialValues = {
-    functionDate: isEditing ? existingBooking.functionDate : new Date().toISOString().split('T')[0],
-    guests: isEditing ? existingBooking.guests : '',
-    functionType: isEditing ? existingBooking.functionType : '',
-    bookingBy: isEditing ? existingBooking.bookingBy : '',
-    address: isEditing ? existingBooking.address : '',
-    cnic: isEditing ? existingBooking.cnic : '',
-    contactNumber: isEditing ? existingBooking.contactNumber : '',
-    startTime: isEditing ? existingBooking.startTime : '18:00',
-    endTime: isEditing ? existingBooking.endTime : '23:00',
-    bookingDays: isEditing ? existingBooking.bookingDays : 1,
-    bookingType: isEditing ? existingBooking.bookingType : 'perHead',
-    costPerHead: isEditing && existingBooking.bookingType === 'perHead' ? existingBooking.costPerHead : '',
-    fixedRate: isEditing && existingBooking.bookingType === 'fixed' ? existingBooking.fixedRate : '',
-    advance: isEditing ? existingBooking.advance : '',
-    djCharges: isEditing ? existingBooking.djCharges : '',
-    decorCharges: isEditing ? existingBooking.decorCharges : '',
-    tmaCharges: isEditing ? existingBooking.tmaCharges : '',
-    otherCharges: isEditing ? existingBooking.otherCharges : '',
-    specialNotes: isEditing ? existingBooking.specialNotes : '',
-    selectedMenuItems: isEditing ? existingBooking.menuItems.filter(item => PREDEFINED_MENU_ITEMS.includes(item)) : [],
-    customMenuItems: isEditing ? existingBooking.menuItems.filter(item => !PREDEFINED_MENU_ITEMS.includes(item)) : ['']
+    functionDate: isEditing && existingBooking ? existingBooking.functionDate : new Date().toISOString().split('T')[0],
+    guests: isEditing && existingBooking ? existingBooking.guests : '',
+    functionType: isEditing && existingBooking ? existingBooking.functionType : '',
+    bookingBy: isEditing && existingBooking ? existingBooking.bookingBy : '',
+    address: isEditing && existingBooking ? existingBooking.address : '',
+    cnic: isEditing && existingBooking ? existingBooking.cnic : '',
+    contactNumber: isEditing && existingBooking ? existingBooking.contactNumber : '',
+    startTime: isEditing && existingBooking ? existingBooking.startTime : '18:00',
+    endTime: isEditing && existingBooking ? existingBooking.endTime : '23:00',
+    bookingDays: isEditing && existingBooking ? existingBooking.bookingDays : 1,
+    bookingType: isEditing && existingBooking ? existingBooking.bookingType : 'perHead',
+    costPerHead: isEditing && existingBooking && existingBooking.bookingType === 'perHead' ? existingBooking.costPerHead : '',
+    fixedRate: isEditing && existingBooking && existingBooking.bookingType === 'fixed' ? existingBooking.fixedRate : '',
+    advance: isEditing && existingBooking ? existingBooking.advance : '',
+    djCharges: isEditing && existingBooking ? existingBooking.djCharges : '',
+    decorCharges: isEditing && existingBooking ? existingBooking.decorCharges : '',
+    tmaCharges: isEditing && existingBooking ? existingBooking.tmaCharges : '',
+    otherCharges: isEditing && existingBooking ? existingBooking.otherCharges : '',
+    specialNotes: isEditing && existingBooking ? existingBooking.specialNotes : '',
+    selectedMenuItems: isEditing && existingBooking ? existingBooking.menuItems.filter(item => PREDEFINED_MENU_ITEMS.includes(item)) : [],
+    customMenuItems: isEditing && existingBooking ? existingBooking.menuItems.filter(item => !PREDEFINED_MENU_ITEMS.includes(item)) : ['']
   };
 
   // Custom validation for time slots
@@ -165,9 +165,17 @@ const BookingFormPage = () => {
 
     // Prepare booking data
     const bookingData = {
-      ...values,
+      functionDate: values.functionDate,
       guests: parseInt(values.guests) || 0,
+      functionType: values.functionType,
+      bookingBy: values.bookingBy,
+      address: values.address,
+      cnic: values.cnic,
+      contactNumber: values.contactNumber,
+      startTime: values.startTime,
+      endTime: values.endTime,
       bookingDays: parseInt(values.bookingDays) || 1,
+      bookingType: values.bookingType,
       costPerHead: values.costPerHead ? parseInt(values.costPerHead) : 0,
       fixedRate: values.fixedRate ? parseInt(values.fixedRate) : 0,
       advance: values.advance ? parseInt(values.advance) : 0,
@@ -183,7 +191,7 @@ const BookingFormPage = () => {
 
     // Dispatch appropriate action
     if (isEditing) {
-      dispatch(updateBooking({ ...existingBooking, ...bookingData }))
+      dispatch(updateBooking({ id: existingBooking.id, bookingData }))
         .then(() => {
           alert('Booking updated successfully!');
           setSubmitting(false);

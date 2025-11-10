@@ -159,42 +159,42 @@ class BookingAPI {
         // Create booking instance
         $booking = new Booking($this->conn);
         
-        // Set booking properties
+        // Set booking properties with null coalescing to preserve existing values
         $booking->id = $id;
-        $booking->function_date = $data->functionDate;
-        $booking->guests = $data->guests;
-        $booking->function_type = $data->functionType;
-        $booking->booking_by = $data->bookingBy;
-        $booking->address = $data->address;
-        $booking->cnic = $data->cnic;
-        $booking->contact_number = $data->contactNumber;
-        $booking->start_time = $data->startTime;
-        $booking->end_time = $data->endTime;
-        $booking->booking_days = $data->bookingDays;
-        $booking->booking_type = $data->bookingType;
-        $booking->cost_per_head = $data->costPerHead;
-        $booking->fixed_rate = $data->fixedRate;
-        $booking->booking_date = $data->bookingDate;
-        $booking->total_cost = $data->totalCost;
-        $booking->advance = $data->advance;
+        $booking->function_date = $data->functionDate ?? $booking->function_date;
+        $booking->guests = $data->guests ?? $booking->guests;
+        $booking->function_type = $data->functionType ?? $booking->function_type;
+        $booking->booking_by = $data->bookingBy ?? $booking->booking_by;
+        $booking->address = $data->address ?? $booking->address;
+        $booking->cnic = $data->cnic ?? $booking->cnic;
+        $booking->contact_number = $data->contactNumber ?? $booking->contact_number;
+        $booking->start_time = $data->startTime ?? $booking->start_time;
+        $booking->end_time = $data->endTime ?? $booking->end_time;
+        $booking->booking_days = $data->bookingDays ?? $booking->booking_days;
+        $booking->booking_type = $data->bookingType ?? $booking->booking_type;
+        $booking->cost_per_head = $data->costPerHead ?? $booking->cost_per_head;
+        $booking->fixed_rate = $data->fixedRate ?? $booking->fixed_rate;
+        $booking->booking_date = $data->bookingDate ?? $booking->booking_date;
+        $booking->total_cost = $data->totalCost ?? $booking->total_cost;
+        $booking->advance = $data->advance ?? $booking->advance;
         // Balance should be calculated as total_cost - advance
-        $booking->balance = $data->totalCost - $data->advance;
-        $booking->dj_charges = $data->djCharges;
-        $booking->decor_charges = $data->decorCharges;
-        $booking->tma_charges = $data->tmaCharges;
-        $booking->other_charges = $data->otherCharges;
-        $booking->special_notes = $data->specialNotes;
+        $booking->balance = ($data->totalCost ?? $booking->total_cost) - ($data->advance ?? $booking->advance);
+        $booking->dj_charges = $data->djCharges ?? $booking->dj_charges;
+        $booking->decor_charges = $data->decorCharges ?? $booking->decor_charges;
+        $booking->tma_charges = $data->tmaCharges ?? $booking->tma_charges;
+        $booking->other_charges = $data->otherCharges ?? $booking->other_charges;
+        $booking->special_notes = $data->specialNotes ?? $booking->special_notes;
 
         // Update booking
         if ($booking->update()) {
-            // Add menu items if provided
-            if (isset($data->menuItems) && is_array($data->menuItems)) {
-                $booking->addMenuItems($booking->id, $data->menuItems);
+            // Only update menu items if provided in the request
+            if (property_exists($data, 'menuItems') && is_array($data->menuItems)) {
+                $booking->updateMenuItems($booking->id, $data->menuItems);
             }
             
-            // Add payments if provided
-            if (isset($data->payments) && is_array($data->payments)) {
-                $booking->addPayments($booking->id, $data->payments);
+            // Only update payments if provided in the request
+            if (property_exists($data, 'payments') && is_array($data->payments)) {
+                $booking->updatePayments($booking->id, $data->payments);
             }
             
             // Get the updated booking with menu items and payments

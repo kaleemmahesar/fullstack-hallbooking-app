@@ -250,6 +250,28 @@ class Booking {
             $stmt->execute();
         }
     }
+    
+    // New method to update menu items only if provided
+    public function updateMenuItems($booking_id, $menu_items) {
+        // Only update if menu_items array is provided and not empty
+        if (!empty($menu_items)) {
+            // First delete existing menu items for this booking
+            $deleteQuery = "DELETE FROM booking_menu_items WHERE booking_id = ?";
+            $deleteStmt = $this->conn->prepare($deleteQuery);
+            $deleteStmt->bindParam(1, $booking_id);
+            $deleteStmt->execute();
+
+            // Then add new menu items
+            foreach ($menu_items as $item) {
+                $query = "INSERT INTO booking_menu_items SET booking_id=:booking_id, menu_item=:menu_item";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(":booking_id", $booking_id);
+                $stmt->bindParam(":menu_item", $item);
+                $stmt->execute();
+            }
+        }
+        // If menu_items array is empty or not provided, we keep the existing menu items
+    }
 
     // Payments functions
     public function getPayments($booking_id) {
@@ -309,6 +331,54 @@ class Booking {
             
             $stmt->execute();
         }
+    }
+    
+    // New method to update payments only if provided
+    public function updatePayments($booking_id, $payments) {
+        // Only update if payments array is provided and not empty
+        if (!empty($payments)) {
+            // First delete existing payments for this booking
+            $deleteQuery = "DELETE FROM booking_payments WHERE booking_id = ?";
+            $deleteStmt = $this->conn->prepare($deleteQuery);
+            $deleteStmt->bindParam(1, $booking_id);
+            $deleteStmt->execute();
+
+            // Then add new payments
+            foreach ($payments as $payment) {
+                // Check if this is a valid payment with required fields
+                if (!isset($payment['amount']) || $payment['amount'] <= 0) {
+                    continue;
+                }
+                
+                $query = "INSERT INTO booking_payments SET 
+                    booking_id=:booking_id, 
+                    amount=:amount, 
+                    payment_date=:payment_date, 
+                    payment_method=:payment_method";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(":booking_id", $booking_id);
+                
+                // Check if the required keys exist and convert to proper types
+                $amount = isset($payment['amount']) ? floatval($payment['amount']) : 0;
+                // Handle the date format - convert ISO date to MySQL date format
+                $payment_date_raw = isset($payment['date']) ? $payment['date'] : date('Y-m-d');
+                // Convert ISO date string to MySQL date format
+                if (strpos($payment_date_raw, 'T') !== false) {
+                    // Extract just the date part from ISO format
+                    $payment_date = substr($payment_date_raw, 0, 10);
+                } else {
+                    $payment_date = $payment_date_raw;
+                }
+                $payment_method = isset($payment['method']) ? strval($payment['method']) : 'Cash';
+                
+                $stmt->bindParam(":amount", $amount);
+                $stmt->bindParam(":payment_date", $payment_date);
+                $stmt->bindParam(":payment_method", $payment_method);
+                
+                $stmt->execute();
+            }
+        }
+        // If payments array is empty or not provided, we keep the existing payments
     }
     
     // Method to add a single payment and update the booking's balance
