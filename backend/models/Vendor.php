@@ -152,7 +152,10 @@ class Vendor {
 
     // Transaction functions
     public function getTransactions($vendor_id) {
-        $query = "SELECT * FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC, id DESC";
+        $query = "SELECT vt.*, e.booking_id FROM vendor_transactions vt 
+                  LEFT JOIN expenses e ON vt.expense_id = e.id 
+                  WHERE vt.vendor_id = ? 
+                  ORDER BY vt.transaction_date DESC, vt.id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $vendor_id);
         $stmt->execute();

@@ -31,12 +31,15 @@ import {
   fetchVendorTransactions,
   addVendorTransaction
 } from '../store/slices/vendorsSlice';
+import { fetchBookings } from '../store/slices/bookingsSlice'; // Import fetchBookings
+import { canEdit, canDelete } from '../utils/authUtils'; // Import auth utilities
 
 const { Title, Text } = Typography;
 
 const VendorManagementPage = () => {
   const dispatch = useDispatch();
   const { vendors, transactions } = useSelector(state => state.vendors);
+  const bookings = useSelector(state => state.bookings.bookings); // Get bookings from state
   
   const [isAdding, setIsAdding] = useState(false);
   const [editingVendor, setEditingVendor] = useState(null);
@@ -57,6 +60,7 @@ const VendorManagementPage = () => {
 
   useEffect(() => {
     dispatch(fetchVendors());
+    dispatch(fetchBookings()); // Fetch bookings when component mounts
   }, [dispatch]);
 
   const handleAddVendor = () => {
@@ -278,17 +282,21 @@ const VendorManagementPage = () => {
           >
             Pay
           </Button>
-          <Button 
-            icon={<EditOutlined />} 
-            onClick={() => handleEditVendor(record)}
-            size="small"
-          />
-          <Button 
-            icon={<DeleteOutlined />} 
-            onClick={() => handleDeleteVendor(record.id)}
-            danger
-            size="small"
-          />
+          {canEdit() && (
+            <Button 
+              icon={<EditOutlined />} 
+              onClick={() => handleEditVendor(record)}
+              size="small"
+            />
+          )}
+          {canDelete() && (
+            <Button 
+              icon={<DeleteOutlined />} 
+              onClick={() => handleDeleteVendor(record.id)}
+              danger
+              size="small"
+            />
+          )}
         </Space>
       ),
     },
@@ -316,6 +324,60 @@ const VendorManagementPage = () => {
           {type === 'credit' ? 'Credit' : 'Payment'}
         </span>
       )
+    },
+    {
+      title: 'Booking',
+      dataIndex: 'bookingId',
+      key: 'bookingId',
+      render: (bookingId) => {
+        if (!bookingId) {
+          return (
+            <span style={{ 
+              padding: '4px 8px', 
+              borderRadius: '4px', 
+              backgroundColor: '#f5f5f5',
+              color: '#9e9e9e',
+              fontSize: '12px'
+            }}>
+              -
+            </span>
+          );
+        }
+        
+        // Find the booking details
+        const booking = bookings.find(b => b.id === bookingId);
+        if (!booking) {
+          return (
+            <span style={{ 
+              padding: '4px 8px', 
+              borderRadius: '4px', 
+              backgroundColor: '#e3f2fd',
+              color: '#1976d2',
+              fontSize: '12px'
+            }}>
+              #{bookingId.substring(0, 8)}
+            </span>
+          );
+        }
+        
+        return (
+          <div>
+            <div style={{ 
+              padding: '4px 8px', 
+              borderRadius: '4px', 
+              backgroundColor: '#e3f2fd',
+              color: '#1976d2',
+              fontSize: '12px',
+              marginBottom: '2px'
+            }}>
+              #{bookingId.substring(0, 8)}
+            </div>
+            <div style={{ fontSize: '11px', color: '#666' }}>
+              {booking.bookingBy} - {new Date(booking.functionDate).toLocaleDateString()}
+            </div>
+          </div>
+        );
+      }
     },
     {
       title: 'Amount',

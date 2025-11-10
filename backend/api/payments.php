@@ -33,7 +33,7 @@ class PaymentAPI {
         $payment_method = isset($data->method) ? $data->method : 'Cash';
         
         if ($booking->addPayment($booking_id, $data->amount, $payment_date, $payment_method)) {
-            // Update the booking's advance amount
+            // Get the updated booking with the new balance
             $stmt = $booking->getById($booking_id);
             if ($stmt->rowCount() > 0) {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);

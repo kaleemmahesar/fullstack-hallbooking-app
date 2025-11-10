@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as api from '../api/mockApi';
+import { canEdit, canDelete } from '../utils/authUtils'; // Import auth utilities
 
 const Layout = ({ children }) => {
   const location = useLocation();

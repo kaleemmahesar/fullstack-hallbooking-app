@@ -31,12 +31,14 @@ class Auth {
             // Set session variables
             $_SESSION['user_id'] = $user->id;
             $_SESSION['username'] = $user->username;
+            $_SESSION['role'] = $user->role;
 
             sendResponse([
                 'message' => 'Login successful',
                 'user' => [
                     'id' => $user->id,
-                    'username' => $user->username
+                    'username' => $user->username,
+                    'role' => $user->role
                 ]
             ], 200);
         } else {

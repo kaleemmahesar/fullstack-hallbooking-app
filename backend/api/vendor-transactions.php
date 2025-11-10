@@ -31,6 +31,7 @@ class VendorTransactionAPI {
                     'id' => $id,
                     'vendorId' => $vendor_id,
                     'expenseId' => $expense_id,
+                    'bookingId' => $booking_id,
                     'type' => $type,
                     'amount' => (float)$amount,
                     'description' => $description,

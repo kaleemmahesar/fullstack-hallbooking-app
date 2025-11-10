@@ -30,6 +30,7 @@ import {
 import { addExpense, updateExpense, deleteExpense } from '../store/slices/expensesSlice';
 import { addVendorTransaction } from '../store/slices/vendorsSlice'; // Add vendor transaction import
 import { EXPENSE_CATEGORIES, PAYMENT_STATUS_OPTIONS } from '../models/Expense';
+import { canEdit, canDelete } from '../utils/authUtils'; // Import auth utilities
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -302,6 +303,12 @@ const ExpenseManagement = ({ bookingId, isAddingExpense, onToggleAddExpense }) =
       )
     },
     {
+      title: 'Booking ID',
+      dataIndex: 'bookingId',
+      key: 'bookingId',
+      render: (bookingId) => bookingId ? `#${bookingId.substring(0, 8)}` : '-'
+    },
+    {
       title: 'Vendor',
       dataIndex: 'vendor',
       key: 'vendor',
@@ -369,17 +376,21 @@ const ExpenseManagement = ({ bookingId, isAddingExpense, onToggleAddExpense }) =
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button 
-            icon={<EditOutlined />} 
-            onClick={() => handleEditExpense(record)}
-            size="small"
-          />
-          <Button 
-            icon={<DeleteOutlined />} 
-            onClick={() => handleDeleteExpense(record.id)}
-            danger
-            size="small"
-          />
+          {canEdit() && (
+            <Button 
+              icon={<EditOutlined />} 
+              onClick={() => handleEditExpense(record)}
+              size="small"
+            />
+          )}
+          {canDelete() && (
+            <Button 
+              icon={<DeleteOutlined />} 
+              onClick={() => handleDeleteExpense(record.id)}
+              danger
+              size="small"
+            />
+          )}
         </Space>
       ),
     },

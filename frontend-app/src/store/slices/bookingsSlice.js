@@ -47,7 +47,8 @@ const bookingsSlice = createSlice({
       if (index !== -1) {
         state.bookings[index] = {
           ...action.payload,
-          balance: action.payload.balance !== undefined && action.payload.balance !== null ? action.payload.balance : action.payload.totalCost - (action.payload.advance || 0)
+          // Only calculate balance if not provided by API
+          balance: action.payload.balance !== undefined ? action.payload.balance : (action.payload.totalCost - (action.payload.advance || 0))
         };
       }
     }
@@ -62,7 +63,8 @@ const bookingsSlice = createSlice({
         // Store plain objects instead of class instances
         state.bookings = action.payload.map(booking => ({
           ...booking,
-          balance: booking.balance !== undefined && booking.balance !== null ? booking.balance : booking.totalCost - (booking.advance || 0)
+          // Only calculate balance if not provided by API
+          balance: booking.balance !== undefined ? booking.balance : (booking.totalCost - (booking.advance || 0))
         }));
       })
       .addCase(fetchBookings.rejected, (state, action) => {
@@ -72,7 +74,8 @@ const bookingsSlice = createSlice({
       .addCase(addBooking.fulfilled, (state, action) => {
         state.bookings.push({
           ...action.payload,
-          balance: action.payload.balance !== undefined && action.payload.balance !== null ? action.payload.balance : action.payload.totalCost - (action.payload.advance || 0)
+          // Only calculate balance if not provided by API
+          balance: action.payload.balance !== undefined ? action.payload.balance : (action.payload.totalCost - (action.payload.advance || 0))
         });
       })
       .addCase(updateBooking.fulfilled, (state, action) => {
@@ -80,7 +83,8 @@ const bookingsSlice = createSlice({
         if (index !== -1) {
           state.bookings[index] = {
             ...action.payload,
-            balance: action.payload.balance !== undefined && action.payload.balance !== null ? action.payload.balance : action.payload.totalCost - (action.payload.advance || 0)
+            // Only calculate balance if not provided by API
+            balance: action.payload.balance !== undefined ? action.payload.balance : (action.payload.totalCost - (action.payload.advance || 0))
           };
         }
       })

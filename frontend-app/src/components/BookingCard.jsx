@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import PaymentModal from './PaymentModal';
 import ExpenseModal from './ExpenseModal';
 import { shareBookingConfirmation } from '../utils/sharingUtils'; // Added import for sharing utilities
+import { canEdit } from '../utils/authUtils'; // Import auth utilities
 
 const BookingCard = ({ bookingId }) => {
   const dispatch = useDispatch();
@@ -25,6 +26,9 @@ const BookingCard = ({ bookingId }) => {
   const advance = booking.advance || 0;
   // Use the balance from the API response if it exists and is not null, otherwise calculate it
   const remainingBalance = (booking.balance !== undefined && booking.balance !== null) ? booking.balance : (totalCost - advance);
+  
+  // Calculate total payments (advance + additional payments)
+  const totalPayments = advance + (booking.payments ? booking.payments.reduce((sum, payment) => sum + payment.amount, 0) : 0);
   
   // Calculate total expenses for this booking
   const bookingExpenses = expenses.filter(expense => {
@@ -112,15 +116,17 @@ const BookingCard = ({ bookingId }) => {
                 Upcoming
               </span>
             )}
-            <button 
-              onClick={handleEditClick}
-              className="text-gray-400 hover:text-indigo-600 transition-colors"
-              title="Edit Booking"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
+            {canEdit() && (
+              <button 
+                onClick={handleEditClick}
+                className="text-gray-400 hover:text-indigo-600 transition-colors"
+                title="Edit Booking"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
         
@@ -165,8 +171,8 @@ const BookingCard = ({ bookingId }) => {
             </p>
           </div>
           <div className="bg-blue-50 p-2 rounded">
-            <p className="text-xs text-blue-700">Expenses</p>
-            <p className="text-sm font-semibold text-blue-900">{formatCurrency(totalExpenses)}</p>
+            <p className="text-xs text-blue-700">Total Payments</p>
+            <p className="text-sm font-semibold text-blue-900">{formatCurrency(totalPayments)}</p>
           </div>
           <div className="bg-purple-50 p-2 rounded">
             <p className="text-xs text-purple-700">Profit</p>

@@ -9,6 +9,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'operator') DEFAULT 'operator',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -113,5 +114,8 @@ CREATE TABLE vendor_transactions (
     FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE SET NULL
 );
 
--- Insert default user for testing (username: admin, password: password)
-INSERT INTO users (username, password) VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+-- Insert default users for testing
+-- Admin user (username: admin, password: password)
+INSERT INTO users (username, password, role) VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- Operator user (username: operator, password: password)
+INSERT INTO users (username, password, role) VALUES ('operator', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'operator');
