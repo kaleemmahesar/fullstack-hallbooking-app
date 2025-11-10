@@ -1,0 +1,87 @@
+# =========================
+# Global ignores
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+*.seed
+*.pid
+*.pid.lock
+*.save
+*.env
+.env.*
+!.env.example
+
+# =========================
+# Editor / OS files
+# =========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =========================
+# Frontend (React)
+# =========================
+frontend-app/node_modules/
+frontend-app/build/
+frontend-app/dist/
+frontend-app/.cache/
+frontend-app/.next/
+frontend-app/out/
+frontend-app/coverage/
+frontend-app/npm-debug.log*
+frontend-app/yarn-debug.log*
+frontend-app/yarn-error.log*
+frontend-app/pnpm-debug.log*
+
+# React environment files
+frontend-app/.env.local
+frontend-app/.env.development.local
+frontend-app/.env.production.local
+frontend-app/.env.test.local
+
+# =========================
+# Backend (PHP)
+# =========================
+backend/vendor/
+backend/composer.lock
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Common PHP temporary and log files
+backend/*.log
+backend/*.sql
+backend/*.sqlite
+backend/storage/
+backend/tmp/
+backend/cache/
+backend/debug.log
+
+# =========================
+# WordPress (if backend uses WP)
+# =========================
+backend/wp-content/cache/
+backend/wp-content/backups/
+backend/wp-content/upgrade/
+backend/wp-content/uploads/
+backend/wp-content/ai1wm-backups/
+backend/wp-content/debug.log
+
+# =========================
+# OS / Misc
+# =========================
+logs/
+tmp/
+temp/
+*.zip
+*.tar.gz
+*.rar
+*.7z
