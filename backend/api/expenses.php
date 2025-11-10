@@ -154,6 +154,8 @@ class ExpenseAPI {
             
             // If this is a credit expense for a vendor, create a vendor transaction
             if ($expense->payment_status === 'credit' && $expense->vendor_id) {
+                error_log("Creating vendor transaction for expense " . $expense->id . " and vendor " . $expense->vendor_id);
+                
                 $vendor = new Vendor($this->conn);
                 // Get the most recent transaction for this vendor to calculate the new balance
                 $latestQuery = "SELECT balance_after FROM vendor_transactions WHERE vendor_id = ? ORDER BY transaction_date DESC, id DESC LIMIT 1";
@@ -164,11 +166,13 @@ class ExpenseAPI {
                 $latestBalance = 0;
                 if ($latestStmt->rowCount() > 0) {
                     $latestRow = $latestStmt->fetch(PDO::FETCH_ASSOC);
-                    $latestBalance = abs((float)$latestRow['balance_after']); // Use absolute value
+                    $latestBalance = (float)$latestRow['balance_after']; // Use the actual value, not absolute
+                    error_log("Previous balance for vendor " . $expense->vendor_id . ": $latestBalance");
                 }
                 
                 // Calculate new balance (adding credit increases balance)
                 $newBalance = $latestBalance + $expense->amount;
+                error_log("New balance for vendor " . $expense->vendor_id . ": $newBalance");
                 
                 $transactionData = [
                     'vendor_id' => $expense->vendor_id,
@@ -179,8 +183,15 @@ class ExpenseAPI {
                     'transaction_date' => date('Y-m-d'),
                     'balance_after' => $newBalance
                 ];
-                $vendor->addTransaction($transactionData);
-                $vendor->updateTotals($expense->vendor_id);
+                
+                error_log("Transaction data: " . print_r($transactionData, true));
+                
+                if ($vendor->addTransaction($transactionData)) {
+                    error_log("Successfully created vendor transaction, updating totals");
+                    $vendor->updateTotals($expense->vendor_id);
+                } else {
+                    error_log("Failed to create vendor transaction");
+                }
             }
             
             // Get the created expense

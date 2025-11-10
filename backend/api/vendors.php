@@ -77,15 +77,25 @@ class VendorAPI {
         // Create vendor instance
         $vendor = new Vendor($this->conn);
         
-        // Set vendor properties
+        // Get the current vendor data first
+        $currentVendorStmt = $vendor->getById($id);
+        if ($currentVendorStmt->rowCount() == 0) {
+            sendError('Vendor not found', 404);
+            return;
+        }
+        
+        $currentVendor = $currentVendorStmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Set vendor properties, preserving existing totals if not provided
         $vendor->id = $id;
-        $vendor->name = $data->name;
-        $vendor->contact_person = $data->contactPerson ?? '';
-        $vendor->phone = $data->phone ?? '';
-        $vendor->email = $data->email ?? '';
-        $vendor->address = $data->address ?? '';
-        $vendor->total_credit = $data->totalCredit ?? 0;
-        $vendor->total_paid = $data->totalPaid ?? 0;
+        $vendor->name = $data->name ?? $currentVendor['name'];
+        $vendor->contact_person = $data->contactPerson ?? $currentVendor['contact_person'];
+        $vendor->phone = $data->phone ?? $currentVendor['phone'];
+        $vendor->email = $data->email ?? $currentVendor['email'];
+        $vendor->address = $data->address ?? $currentVendor['address'];
+        // Handle both camelCase and snake_case for totals
+        $vendor->total_credit = $data->totalCredit ?? $data->total_credit ?? $currentVendor['total_credit'];
+        $vendor->total_paid = $data->totalPaid ?? $data->total_paid ?? $currentVendor['total_paid'];
 
         // Update vendor
         if ($vendor->update()) {
@@ -108,6 +118,12 @@ class VendorAPI {
         
         // Set vendor ID
         $vendor->id = $id;
+        
+        // Check if vendor has transactions
+        if ($vendor->hasTransactions($id)) {
+            sendError('Cannot delete vendor with transaction history. Please delete all transactions first.', 400);
+            return;
+        }
 
         // Delete vendor
         if ($vendor->delete()) {

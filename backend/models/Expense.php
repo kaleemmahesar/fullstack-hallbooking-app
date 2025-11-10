@@ -120,6 +120,13 @@ class Expense {
     }
 
     public function delete() {
+        // First, delete any vendor transactions associated with this expense
+        $vendorTransactionQuery = "DELETE FROM vendor_transactions WHERE expense_id = ?";
+        $vendorTransactionStmt = $this->conn->prepare($vendorTransactionQuery);
+        $vendorTransactionStmt->bindParam(1, $this->id);
+        $vendorTransactionStmt->execute();
+        
+        // Then delete the expense itself
         $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         $this->id = htmlspecialchars(strip_tags($this->id));

@@ -56,6 +56,8 @@ class VendorTransactionAPI {
             sendError('Vendor ID, type, and amount are required', 400);
         }
 
+        error_log("Creating transaction for vendor " . $data->vendorId . " - Type: " . $data->type . ", Amount: " . $data->amount);
+
         // Create vendor instance
         $vendor = new Vendor($this->conn);
         
@@ -73,10 +75,18 @@ class VendorTransactionAPI {
         // Create transaction
         if ($vendor->addTransaction($transactionData)) {
             // Update vendor totals
-            $vendor->updateTotals($data->vendorId);
+            error_log("Updating totals for vendor " . $data->vendorId);
+            $updateResult = $vendor->updateTotals($data->vendorId);
+            
+            if ($updateResult) {
+                error_log("Successfully updated totals for vendor " . $data->vendorId);
+            } else {
+                error_log("Failed to update totals for vendor " . $data->vendorId);
+            }
             
             sendResponse(['message' => 'Transaction created successfully'], 201);
         } else {
+            error_log("Failed to create transaction for vendor " . $data->vendorId);
             sendError('Unable to create transaction', 500);
         }
     }
