@@ -27,6 +27,13 @@ const BookingSlip = ({ bookingId }) => {
     generateBookingSlipPDF(booking, expenses);
   };
 
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes} ${period}`;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6 print:p-0 print:shadow-none print:rounded-none print:m-0">
       {/* Print Header */}
@@ -77,7 +84,7 @@ const BookingSlip = ({ bookingId }) => {
             </div>
             <div className="flex print:block">
               <span className="w-40 font-medium text-gray-600 print:w-auto print:block print:mb-1">Time:</span>
-              <span>{booking.startTime} - {booking.endTime}</span>
+              <span>{formatTime(booking.startTime)} - {formatTime(booking.endTime)}</span>
             </div>
           </div>
         </div>

@@ -7,6 +7,17 @@ import { Link } from 'react-router-dom';
 // Extend dayjs with isBetween plugin
 dayjs.extend(isBetween);
 
+// Utility function to format time (HH:MM:SS or HH:MM) to HH:MM only
+const formatTime = (timeString) => {
+  if (!timeString) return '';
+  // Split the time string by ':' and take only the first two parts (hours and minutes)
+  const parts = timeString.split(':');
+  if (parts.length >= 2) {
+    return `${parts[0]}:${parts[1]}`;
+  }
+  return timeString;
+};
+
 const EventCalendar = () => {
   const { bookings } = useSelector(state => state.bookings);
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -122,9 +133,6 @@ const EventCalendar = () => {
           >
             Today
           </button>
-          <Link to="/calendar" className="ml-1 text-xs text-indigo-600 hover:text-indigo-800">
-            View Full Calendar
-          </Link>
         </div>
       </div>
 
@@ -166,7 +174,7 @@ const EventCalendar = () => {
                       title={`${event.functionType} - ${event.startTime} to ${event.endTime} ${isEventCompleted(event) ? '(Completed)' : ''}`}
                     >
                       <div className={`font-medium truncate ${isEventCompleted(event) ? 'line-through' : ''}`}>{event.functionType}</div>
-                      <div className={`truncate ${isEventCompleted(event) ? 'line-through' : ''}`}>{event.startTime}</div>
+                      <div className={`truncate ${isEventCompleted(event) ? 'line-through' : ''}`}>{formatTime(event.startTime)} - {formatTime(event.endTime)}</div>
                     </div>
                   ))}
                   {dayEvents.length > 3 && (

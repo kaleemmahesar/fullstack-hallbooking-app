@@ -2,6 +2,17 @@ import React from 'react';
 import Button from './Button';
 import { shareBookingConfirmation } from '../utils/sharingUtils'; // Added import for sharing utilities
 
+// Utility function to format time (HH:MM:SS or HH:MM) to HH:MM only
+const formatTime = (timeString) => {
+  if (!timeString) return '';
+  // Split the time string by ':' and take only the first two parts (hours and minutes)
+  const parts = timeString.split(':');
+  if (parts.length >= 2) {
+    return `${parts[0]}:${parts[1]}`;
+  }
+  return timeString;
+};
+
 const BookingReceipt = ({ booking, onClose }) => {
   // Calculate total cost
   const totalCost = booking.totalCost || 0;
@@ -80,7 +91,7 @@ const BookingReceipt = ({ booking, onClose }) => {
                 </div>
                 <div class="flex justify-between text-xs print-small">
                   <span class="text-gray-600">Time:</span>
-                  <span class="font-medium">${booking.startTime} - ${booking.endTime}</span>
+                  <span class="font-medium">${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}</span>
                 </div>
                 <div class="flex justify-between text-xs print-small">
                   <span class="text-gray-600">Guests:</span>
@@ -255,7 +266,7 @@ const BookingReceipt = ({ booking, onClose }) => {
               </div>
               <div className="flex justify-between text-xs print-small">
                 <span className="text-gray-600">Time:</span>
-                <span className="font-medium">{booking.startTime} - {booking.endTime}</span>
+                <span className="font-medium">{formatTime(booking.startTime)} - {formatTime(booking.endTime)}</span>
               </div>
               <div className="flex justify-between text-xs print-small">
                 <span className="text-gray-600">Guests:</span>

@@ -41,13 +41,23 @@ export const generateWhatsAppMessage = (booking) => {
   if (booking.tmaCharges > 0) additionalCharges.push(`TMA Charges: ₨${booking.tmaCharges.toLocaleString()}`);
   if (booking.otherCharges > 0) additionalCharges.push(`Other Charges: ₨${booking.otherCharges.toLocaleString()}`);
   
+  // Format time to show only hours and minutes
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    const parts = timeString.split(':');
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}`;
+    }
+    return timeString;
+  };
+  
   return `*Wedding Hall Booking Confirmation*
 
 *Booking ID:* #${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}
 *Customer:* ${booking.bookingBy}
 *Function Type:* ${booking.functionType}
 *Function Date:* ${new Date(booking.functionDate).toLocaleDateString()}
-*Time:* ${booking.startTime} - ${booking.endTime}
+*Time:* ${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}
 *Hall:* ${booking.hallReserved || 'Main Hall'}
 *Guests:* ${booking.guests}
 *Booking Type:* ${booking.bookingType === 'perHead' ? 'Per Head' : 'Fixed Rate'}
@@ -190,7 +200,7 @@ async function sendBookingSMS(booking) {
 `;
   message += `Date: ${new Date(booking.functionDate).toLocaleDateString()}
 `;
-  message += `Time: ${booking.startTime} - ${booking.endTime}
+  message += `Time: ${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}
 `;
   message += `Guests: ${booking.guests}
 `;
