@@ -43,7 +43,7 @@ export const generateWhatsAppMessage = (booking) => {
   
   return `*Wedding Hall Booking Confirmation*
 
-*Booking ID:* #${booking.id.substring(0, 8)}
+*Booking ID:* #${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}
 *Customer:* ${booking.bookingBy}
 *Function Type:* ${booking.functionType}
 *Function Date:* ${new Date(booking.functionDate).toLocaleDateString()}
@@ -105,7 +105,7 @@ export const shareViaWhatsApp = async (booking) => {
     // Create a temporary link for the PDF
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = `booking-receipt-${booking.id ? booking.id.substring(0, 8) : 'N/A'}.pdf`;
+    link.download = `booking-receipt-${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}.pdf`;
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
@@ -135,11 +135,11 @@ export const sendSMSNotifications = (booking) => {
   
   alert(`SMS Notification to Customer:
 To: ${booking.contactNumber}
-Message: Dear ${booking.bookingBy}, your wedding hall booking (ID: ${booking.id ? booking.id.substring(0, 8) : 'N/A'}) has been confirmed for ${new Date(booking.functionDate).toLocaleDateString()} from ${booking.startTime} to ${booking.endTime}. Total amount: ₨${(booking.totalCost || 0).toLocaleString()}. Thank you!`);
+Message: Dear ${booking.bookingBy}, your wedding hall booking (ID: ${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}) has been confirmed for ${new Date(booking.functionDate).toLocaleDateString()} from ${booking.startTime} to ${booking.endTime}. Total amount: ₨${(booking.totalCost || 0).toLocaleString()}. Thank you!`);
   
   alert(`SMS Notification to Owner:
 To: 0300-1234567
-Message: New booking confirmed for ${booking.bookingBy} on ${new Date(booking.functionDate).toLocaleDateString()} from ${booking.startTime} to ${booking.endTime}. Booking ID: ${booking.id ? booking.id.substring(0, 8) : 'N/A'}. Total amount: ₨${(booking.totalCost || 0).toLocaleString()}.`);
+Message: New booking confirmed for ${booking.bookingBy} on ${new Date(booking.functionDate).toLocaleDateString()} from ${booking.startTime} to ${booking.endTime}. Booking ID: ${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}. Total amount: ₨${(booking.totalCost || 0).toLocaleString()}.`);
   
   // In a real implementation, you would use an SMS API like:
   // fetch('https://api.smsprovider.com/send', {
@@ -179,25 +179,39 @@ async function sendBookingSMS(booking) {
   const fixedRate = booking.fixedRate || 0;
   
   // Create detailed SMS message
-  let message = `*WEDDING HALL BOOKING CONFIRMATION*\n\n`;
-  message += `Booking ID: ${booking.id ? booking.id.substring(0, 8) : 'N/A'}\n`;
-  message += `Customer: ${booking.bookingBy}\n`;
-  message += `Function: ${booking.functionType}\n`;
-  message += `Date: ${new Date(booking.functionDate).toLocaleDateString()}\n`;
-  message += `Time: ${booking.startTime} - ${booking.endTime}\n`;
-  message += `Guests: ${booking.guests}\n`;
-  message += `Booking Type: ${booking.bookingType === 'perHead' ? 'Per Head' : 'Fixed Rate'}\n`;
+  let message = `*WEDDING HALL BOOKING CONFIRMATION*
+
+`;
+  message += `Booking ID: ${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}
+`;
+  message += `Customer: ${booking.bookingBy}
+`;
+  message += `Function: ${booking.functionType}
+`;
+  message += `Date: ${new Date(booking.functionDate).toLocaleDateString()}
+`;
+  message += `Time: ${booking.startTime} - ${booking.endTime}
+`;
+  message += `Guests: ${booking.guests}
+`;
+  message += `Booking Type: ${booking.bookingType === 'perHead' ? 'Per Head' : 'Fixed Rate'}
+`;
   
   if (booking.bookingType === 'perHead') {
-    message += `Cost Per Head: ₨${perHeadCost.toLocaleString()}\n`;
+    message += `Cost Per Head: ₨${perHeadCost.toLocaleString()}
+`;
   } else {
-    message += `Fixed Rate: ₨${fixedRate.toLocaleString()}\n`;
+    message += `Fixed Rate: ₨${fixedRate.toLocaleString()}
+`;
   }
   
-  message += `Total Amount: ₨${totalCost.toLocaleString()}\n`;
-  message += `Advance Paid: ₨${advance.toLocaleString()}\n`;
-  message += `Balance Due: ₨${balance.toLocaleString()}\n\n`;
-  
+  message += `Total Amount: ₨${totalCost.toLocaleString()}
+`;
+  message += `Advance Paid: ₨${advance.toLocaleString()}
+`;
+  message += `Balance Due: ₨${balance.toLocaleString()}
+`;
+
   // Add additional charges if any
   const additionalCharges = [];
   if (booking.djCharges > 0) additionalCharges.push(`DJ: ₨${booking.djCharges.toLocaleString()}`);
@@ -206,10 +220,13 @@ async function sendBookingSMS(booking) {
   if (booking.otherCharges > 0) additionalCharges.push(`Other: ₨${booking.otherCharges.toLocaleString()}`);
   
   if (additionalCharges.length > 0) {
-    message += `Additional Charges:\n${additionalCharges.join(', ')}\n\n`;
+    message += `Additional Charges:
+${additionalCharges.join(', ')}
+`;
   }
   
-  message += `Thank you for choosing our wedding hall services!\n`;
+  message += `Thank you for choosing our wedding hall services!
+`;
   message += `For queries, contact: 0300-1234567`;
   
   // Check if Twilio credentials are available
@@ -262,5 +279,5 @@ export const shareBookingConfirmation = async (booking) => {
   
   // Send SMS notifications
   // sendSMSNotifications(booking);
-  sendBookingSMS(booking);
+  // sendBookingSMS(booking);
 };

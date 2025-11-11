@@ -46,7 +46,7 @@ const BookingReceipt = ({ booking, onClose }) => {
               <div class="space-y-1">
                 <div class="flex justify-between text-xs print-small">
                   <span class="text-gray-600">ID:</span>
-                  <span class="font-medium">#${booking.id ? booking.id.substring(0, 8) : 'N/A'}</span>
+                  <span class="font-medium">#{booking.id ? String(booking.id).substring(0, 8) : 'N/A'}</span>
                 </div>
                 <div class="flex justify-between text-xs print-small">
                   <span class="text-gray-600">Date:</span>
@@ -221,7 +221,7 @@ const BookingReceipt = ({ booking, onClose }) => {
             <div className="space-y-1">
               <div className="flex justify-between text-xs print-small">
                 <span className="text-gray-600">ID:</span>
-                <span className="font-medium">#{booking.id ? booking.id.substring(0, 8) : 'N/A'}</span>
+                <span className="font-medium">#{booking.id ? String(booking.id).substring(0, 8) : 'N/A'}</span>
               </div>
               <div className="flex justify-between text-xs print-small">
                 <span className="text-gray-600">Date:</span>
