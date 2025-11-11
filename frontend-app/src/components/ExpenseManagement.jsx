@@ -169,12 +169,13 @@ const ExpenseManagement = ({ bookingId, isAddingExpense, onToggleAddExpense }) =
       } else {
         // Add new expense
         dispatch(addExpense(expenseData))
+          .unwrap() // Add unwrap() to properly handle the promise
           .then((result) => {
             // If this is a credit expense, create a vendor transaction
             if (values.paymentStatus === 'credit' && values.vendor) {
               const transactionData = {
                 vendorId: values.vendor,
-                expenseId: result.payload.id,
+                expenseId: result.id, // Use the id from the result
                 type: 'credit',
                 amount: parseFloat(values.amount),
                 description: `Credit for ${values.title}`,

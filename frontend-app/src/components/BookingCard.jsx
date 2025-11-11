@@ -159,7 +159,7 @@ const BookingCard = ({ bookingId }) => {
         </div>
         
         {/* Financial information in a compact horizontal layout */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-3">
           <div className="bg-indigo-50 p-2 rounded">
             <p className="text-xs text-indigo-700">Total</p>
             <p className="text-sm font-semibold text-indigo-900">{formatCurrency(totalCost)}</p>
@@ -175,8 +175,12 @@ const BookingCard = ({ bookingId }) => {
             <p className="text-sm font-semibold text-blue-900">{formatCurrency(totalPayments)}</p>
           </div>
           <div className="bg-purple-50 p-2 rounded">
-            <p className="text-xs text-purple-700">Profit</p>
-            <p className="text-sm font-semibold text-purple-900">{formatCurrency(totalCost - totalExpenses)}</p>
+            <p className="text-xs text-purple-700">Expenses</p>
+            <p className="text-sm font-semibold text-purple-900">{formatCurrency(totalExpenses)}</p>
+          </div>
+          <div className="bg-yellow-50 p-2 rounded">
+            <p className="text-xs text-yellow-700">Profit</p>
+            <p className="text-sm font-semibold text-yellow-900">{formatCurrency(totalCost - totalExpenses)}</p>
           </div>
         </div>
         
@@ -272,7 +276,7 @@ const BookingCard = ({ bookingId }) => {
                         <div class="space-y-1">
                           <div class="flex justify-between text-xs print-small">
                             <span class="text-gray-600">ID:</span>
-                            <span class="font-medium">#${booking.id.substring(0, 8)}</span>
+                            <span class="font-medium">#${String(booking.id).substring(0, 8)}</span>
                           </div>
                           <div class="flex justify-between text-xs print-small">
                             <span class="text-gray-600">Date:</span>

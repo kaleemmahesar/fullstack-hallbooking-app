@@ -344,6 +344,9 @@ const VendorManagementPage = () => {
           );
         }
         
+        // Convert bookingId to string if it's not already
+        const bookingIdStr = String(bookingId);
+        
         // Find the booking details
         const booking = bookings.find(b => b.id === bookingId);
         if (!booking) {
@@ -355,7 +358,7 @@ const VendorManagementPage = () => {
               color: '#1976d2',
               fontSize: '12px'
             }}>
-              #{bookingId.substring(0, 8)}
+              #{bookingIdStr.substring(0, 8)}
             </span>
           );
         }
@@ -370,7 +373,7 @@ const VendorManagementPage = () => {
               fontSize: '12px',
               marginBottom: '2px'
             }}>
-              #{bookingId.substring(0, 8)}
+              #{bookingIdStr.substring(0, 8)}
             </div>
             <div style={{ fontSize: '11px', color: '#666' }}>
               {booking.bookingBy} - {new Date(booking.functionDate).toLocaleDateString()}
