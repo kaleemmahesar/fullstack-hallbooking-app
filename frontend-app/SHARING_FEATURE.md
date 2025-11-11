@@ -63,7 +63,7 @@ const sendSMSNotifications = async (booking) => {
     },
     body: JSON.stringify({
       to: booking.contactNumber,
-      message: `Dear ${booking.bookingBy}, your wedding hall booking (ID: ${booking.id.substring(0, 8)}) has been confirmed.`
+      message: `Dear ${booking.bookingBy}, your wedding hall booking (ID: ${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}) has been confirmed.`
     })
   });
 
@@ -76,7 +76,7 @@ const sendSMSNotifications = async (booking) => {
     },
     body: JSON.stringify({
       to: '0300-1234567', // Owner's number
-      message: `New booking confirmed for ${booking.bookingBy}. Booking ID: ${booking.id.substring(0, 8)}.`
+      message: `New booking confirmed for ${booking.bookingBy}. Booking ID: ${booking.id ? String(booking.id).substring(0, 8) : 'N/A'}.`
     })
   });
 };

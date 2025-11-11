@@ -307,7 +307,7 @@ const ExpenseManagement = ({ bookingId, isAddingExpense, onToggleAddExpense }) =
       title: 'Booking ID',
       dataIndex: 'bookingId',
       key: 'bookingId',
-      render: (bookingId) => bookingId ? `#${bookingId.substring(0, 8)}` : '-'
+      render: (bookingId) => bookingId ? `#${String(bookingId).substring(0, 8)}` : '-'
     },
     {
       title: 'Vendor',
