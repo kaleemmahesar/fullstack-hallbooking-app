@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import EventCalendar from '../components/EventCalendar';
+import { fetchBookings } from '../store/slices/bookingsSlice';
+import { fetchExpenses } from '../store/slices/expensesSlice';
 
 const DashboardPage = () => {
+  const dispatch = useDispatch();
   const bookings = useSelector(state => state.bookings.bookings);
+
+  // Load bookings and expenses when component mounts
+  useEffect(() => {
+    dispatch(fetchBookings());
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
   // Calculate statistics
   const today = dayjs();
